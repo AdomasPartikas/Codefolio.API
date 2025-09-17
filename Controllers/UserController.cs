@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Codefolio.API.Dto;
 using System.Text.RegularExpressions;
+using Codefolio.API.Interfaces;
 
 namespace Codefolio.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController : ControllerBase
+public class UserController(IAuthService _authService, AutoMapper.IMapper _mapper) : ControllerBase
 {
     [HttpPost]
     [Route("register")]
@@ -21,7 +22,9 @@ public class UserController : ControllerBase
         if (!isValid)
             return BadRequest(errorMessage);
 
-        return Ok(userDto);
+        var authDto = _mapper.Map<AuthDto>(_authService.Register(userDto.Username, userDto.Email, userDto.Password));
+
+        return Ok(authDto);
     }
 }
 
